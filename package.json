@@ -3,13 +3,7 @@
     "version": "0.0.1",
     "private": false,
     "description": "",
-    "scripts": {
-        "dev": "npm-run-all --parallel watch:transpile watch:run",
-        "watch:run": "nodemon \"./build/rws.server.js\" --watch \"./build\"",
-        "watch:transpile": "webpack --config webpack.config.js --watch",
-        "build": "webpack --config webpack.config.js --output-path ./dist",
-        "run": "node build/rws.nest-interconnectors.js"
-    },
+    "main": "src/index.ts",
     "author": "skygate",
     "license": "ISC",
     "dependencies": {        
