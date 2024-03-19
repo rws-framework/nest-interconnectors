@@ -1,6 +1,7 @@
-import TheService from './_service';
+import TheService from '@rws-framework/client/src/services/_service';
+import ITheUser from '@rws-framework/client/src/interfaces/IRWSUser';
+
 import { io, Socket } from 'socket.io-client';
-import ITheUser from '../interfaces/IRWSUser';
 import { v4 as uuid } from 'uuid';
 import { ping, disconnect as disconnectWs, reconnect as reconnectWs } from './_ws_handlers/ConnectionHandler';
 import WSEventHandler from './_ws_handlers/EventHandler';
@@ -61,8 +62,6 @@ class WSService extends TheService {
         }          
         //, transports:  ['websocket']
         this._ws = WSService.websocket_instance;
-
-  
 
         if (this.user?.mongoId) {
             this._wsId = this.user.mongoId;

@@ -1,3 +1,3 @@
-import WSService from "./services/WSService"
+import WSService from './services/WSService';
 
-export { WSService } 
+export { WSService }; 
