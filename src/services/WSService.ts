@@ -9,12 +9,6 @@ import WSMessageHandler from './_ws_handlers/MessageHandler';
 type WSEvent = string;
 type WSStatus = 'WS_OPEN' | 'WS_CLOSED' | 'WS_CONNECTING';
 
-// function logClickableLink(text: string, url: string) {  
-//     console.log('[', url, ']:', text);  
-// }
-
-// const getCurrentLineNumber = UtilsService.getCurrentLineNumber;
-
 
 const  wsLog = async (fakeError: Error, text: any, socketId: string = null, isError: boolean = false): Promise<void> => {  
     const logit = isError ? console.error : console.log;
@@ -223,4 +217,4 @@ class WSService extends TheService {
 }
 
 export default WSService.getSingleton();
-export { WSService as WSServiceInstance, WSEvent, WSService as WSInstance, WSStatus };
+export { WSService as WSServiceInstance, WSEvent, WSStatus };

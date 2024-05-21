@@ -1,9 +1,9 @@
 {
     "name": "@rws-framework/nest-interconnectors",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "private": false,
     "description": "",
-    "main": "src/index.ts",
+    "main": "src/plugin.ts",
     "author": "skygate",
     "license": "ISC",
     "dependencies": {        
@@ -13,7 +13,7 @@
         "pm2": "^5.3.0",        
         "reflect-metadata": "^0.2.1",
         "rws-js-server": "*",
-        "rws-js-client": "*",
+        "@rws-framework/client": "^2.8.0",
         "ts-transformer-keys": "^0.4.4",
         "tsconfig-paths-webpack-plugin": "^4.1.0",
         "typescript": "^5.3.3",
