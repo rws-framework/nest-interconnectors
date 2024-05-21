@@ -1,6 +1,5 @@
 import TheService from '@rws-framework/client/src/services/_service';
 import ITheUser from '@rws-framework/client/src/interfaces/IRWSUser';
-
 import { io, Socket } from 'socket.io-client';
 import { v4 as uuid } from 'uuid';
 import { ping, disconnect as disconnectWs, reconnect as reconnectWs } from './_ws_handlers/ConnectionHandler';
@@ -19,10 +18,11 @@ type WSStatus = 'WS_OPEN' | 'WS_CLOSED' | 'WS_CONNECTING';
 
 const  wsLog = async (fakeError: Error, text: any, socketId: string = null, isError: boolean = false): Promise<void> => {  
     const logit = isError ? console.error : console.log;
-    logit(`[webpack://junction_ai_trainer_ui/${module.id.replace('./', '')}:`, `<WS-CLIENT>${socketId ? `(${socketId})` : ''}`, text);
+    logit(`<WS-CLIENT>${socketId ? `(${socketId})` : ''}`, text);
 };
 
 class WSService extends TheService {
+    static _DEFAULT: boolean = true;
     static websocket_instance: Socket;
     private _ws: Socket | null = null;
   
@@ -62,6 +62,8 @@ class WSService extends TheService {
         }          
         //, transports:  ['websocket']
         this._ws = WSService.websocket_instance;
+
+  
 
         if (this.user?.mongoId) {
             this._wsId = this.user.mongoId;
@@ -132,6 +134,13 @@ class WSService extends TheService {
     setUser(user: ITheUser): void
     {
         this.user = user;
+    }
+
+    public listenForError<T extends Error | any = Error | any>(callback: (data: { error: T }) => void, method: string): void
+    {
+        this.socket().on(method, (rawData: string) => {            
+            callback(JSON.parse(rawData));
+        });
     }
 
     public listenForMessage(callback: (data: any, isJson?: boolean) => void, method?: string): () => void 
