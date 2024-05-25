@@ -1,5 +1,5 @@
 import TheService from '@rws-framework/client/src/services/_service';
-import ITheUser from '@rws-framework/client/src/interfaces/IRWSUser';
+import ITheUser from '@rws-framework/client/src/types/IRWSUser';
 import { io, Socket } from 'socket.io-client';
 import { v4 as uuid } from 'uuid';
 import { ping, disconnect as disconnectWs, reconnect as reconnectWs } from './_ws_handlers/ConnectionHandler';
