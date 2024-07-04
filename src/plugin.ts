@@ -10,6 +10,8 @@ interface WSOptions extends DefaultRWSPluginOptionsType {
 class RWSWebsocketsPlugin extends RWSPlugin<WSOptions> {
     async onClientStart(): Promise<void> 
     {       
+
+        console.log('on ws start');
         const wsService: WSServiceInstance = this.container.get(WSService);
         const notifyService: NotifyServiceInstance = this.container.get(NotifyService);
         const appConfig: ConfigServiceInstance = this.container.get(ConfigService);

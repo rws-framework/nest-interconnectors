@@ -16,7 +16,7 @@ const  wsLog = async (fakeError: Error, text: any, socketId: string = null, isEr
 };
 
 class WSService extends TheService {
-    static _DEFAULT: boolean = true;
+    static _DEFAULT: boolean = false;
     static websocket_instance: Socket;
     private _ws: Socket | null = null;
   
