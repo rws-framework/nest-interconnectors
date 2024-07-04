@@ -46,8 +46,7 @@ class WSService extends TheService {
             Authorization: 'Bearer ' + this.user?.jwt_token,
         } : {};
 
-        if(!WSService.websocket_instance){
-            console.log('WSSERVICE', headers);
+        if(!WSService.websocket_instance){            
             const tokenString = headers.Authorization ? `?token=${this.user.jwt_token}` : '' ;
             WSService.websocket_instance = io(this.url + tokenString, { 
                 auth: user?.jwt_token ? { token:  user.jwt_token} : {}, 
