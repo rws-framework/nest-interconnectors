@@ -16,6 +16,6 @@
       "paths": {                 
       }
     },
-    "include": ["./src"],  
+    "include": ["./src", "../client/src/types/IRWSPlugin.ts"],  
     "exclude": []
   }
