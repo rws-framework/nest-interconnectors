@@ -1,4 +1,4 @@
-import { RWSClient, RWSClientInstance, RWSPlugin, DefaultRWSPluginOptionsType, NotifyService, NotifyServiceInstance, ConfigService, ConfigServiceInstance } from '@rws-framework/client';
+import { RWSClient, RWSClientInstance, RWSPlugin, DefaultRWSPluginOptionsType, NotifyService, NotifyServiceInstance, ConfigService, ConfigServiceInstance, IRWSUser } from '@rws-framework/client';
 import WSService, { WSServiceInstance, WSEvent, WSStatus } from './services/WSService';
 
 WSService;
@@ -9,7 +9,7 @@ interface WSOptions extends DefaultRWSPluginOptionsType {
 
 class RWSWebsocketsPlugin extends RWSPlugin<WSOptions> {
     async onClientStart(): Promise<void> 
-    {               
+    {                       
         const wsService: WSServiceInstance = this.container.get(WSService);
         const notifyService: NotifyServiceInstance = this.container.get(NotifyService);
         const appConfig: ConfigServiceInstance = this.container.get(ConfigService);
@@ -24,11 +24,15 @@ class RWSWebsocketsPlugin extends RWSPlugin<WSOptions> {
 
         wsService.on('ws:reconnect', (instance, params) => {
             console.info('WS RECONNECTION ' + (params.reconnects + 1));
-            notifyService.notify('Your websocket client has tried to reconnect to server. Attempt #' + (params.reconnects+1), 'warning');
+            notifyService.notify('Your websocket client has tried to reconnect to server. Attempt #' + (params.reconnects + 1), 'warning');
         });  
 
-        wsService.init(appConfig.get('wsUrl'), appConfig.get('user'), appConfig.get('transports'));        
+        wsService.init(appConfig.get('wsUrl'), appConfig.get('transports'));        
     };
+
+    async onSetUser(user: IRWSUser): Promise<void> {        
+        this.container.get(WSService).setUser(user);         
+    }
 }
 
 export { RWSWebsocketsPlugin, WSService, WSServiceInstance, WSEvent, WSStatus, WSOptions };

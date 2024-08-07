@@ -17,7 +17,7 @@ function reconnect(instance: WSServiceInstance): void {
         instance._connecting = true;
         instance.reconnects++;
         setTimeout(() => {
-            instance.init(instance.getUrl()!, instance.getUser());
+            instance.init(instance.getUrl()!);
             instance.reconnects = rc + 1;
         }, 1500);
 

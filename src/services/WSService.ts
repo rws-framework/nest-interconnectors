@@ -36,11 +36,11 @@ class WSService extends TheService {
 
     public eventListeners: Map<string, Array<(instance: WSService, params: any) => any>> = new Map();
 
-    public async init(url: string, user?: ITheUser, transports: string[] = null): Promise<WSService> {
+    public async init(url: string, transports: string[] = null): Promise<WSService> {
         this._connecting = true;        
         wsLog(new Error(), 'Connecting to: ' + url);
-        this.url = url;
-        this.user = user;            
+        this.url = url;     
+        const user = this.user;     
 
         const headers = this.user?.jwt_token ? {
             Authorization: 'Bearer ' + this.user?.jwt_token,
