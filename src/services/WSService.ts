@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { ping, disconnect as disconnectWs, reconnect as reconnectWs } from './_ws_handlers/ConnectionHandler';
 import WSEventHandler from './_ws_handlers/EventHandler';
 import WSMessageHandler from './_ws_handlers/MessageHandler';
+import { ConfigService, ConfigServiceInstance } from '@rws-framework/client';
 
 type WSEvent = string;
 type WSStatus = 'WS_OPEN' | 'WS_CLOSED' | 'WS_CONNECTING';
@@ -36,7 +37,14 @@ class WSService extends TheService {
 
     public eventListeners: Map<string, Array<(instance: WSService, params: any) => any>> = new Map();
 
-    public async init(url: string, transports: string[] = null): Promise<WSService> {
+    constructor(@ConfigService private configService: ConfigServiceInstance){
+        super();
+    }
+
+    public init(): WSService {
+        const url: string = this.configService.get('wsUrl');
+        const transports: string[] = this.configService.get('transports');        
+        
         this._connecting = true;        
         wsLog(new Error(), 'Connecting to: ' + url);
         this.url = url;     
@@ -138,6 +146,10 @@ class WSService extends TheService {
 
     public listenForMessage(callback: (data: any, isJson?: boolean) => void, method?: string): () => void 
     {
+        if(!this.isActive()){
+            this.init();
+        }
+
         const disableHandler = () => {
             this.socket().off(method, callback);
         };
@@ -167,7 +179,11 @@ class WSService extends TheService {
         });
     }
 
-    public sendMessage<T>(method: string, msg: T): void {                
+    public sendMessage<T>(method: string, msg: T): void {  
+        if(!this.isActive()){
+            this.init();
+        }
+
         WSMessageHandler.sendMessage<T>(this, method, msg);
     }
 
