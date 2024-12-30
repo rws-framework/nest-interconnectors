@@ -1,4 +1,4 @@
-import { RWSClient, RWSClientInstance, RWSPlugin, DefaultRWSPluginOptionsType, NotifyService, NotifyServiceInstance, ConfigService, ConfigServiceInstance, IRWSUser } from '@rws-framework/client';
+import { RWSPlugin, DefaultRWSPluginOptionsType, NotifyService, NotifyServiceInstance, IRWSUser } from '@rws-framework/client';
 import WSService, { WSServiceInstance, WSEvent, WSStatus } from './services/WSService';
 
 WSService;
@@ -34,4 +34,7 @@ class RWSWebsocketsPlugin extends RWSPlugin<WSOptions> {
     }
 }
 
-export { RWSWebsocketsPlugin, WSService, WSServiceInstance, WSEvent, WSStatus, WSOptions };
+
+export { RWSWebsocketsPlugin, WSService, WSServiceInstance, WSOptions };
+
+export type {WSEvent, WSStatus}

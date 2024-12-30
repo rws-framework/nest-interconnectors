@@ -10,7 +10,6 @@ import { ConfigService, ConfigServiceInstance } from '@rws-framework/client';
 type WSEvent = string;
 type WSStatus = 'WS_OPEN' | 'WS_CLOSED' | 'WS_CONNECTING';
 
-
 const  wsLog = async (fakeError: Error, text: any, socketId: string = null, isError: boolean = false): Promise<void> => {  
     const logit = isError ? console.error : console.log;
     logit(`<WS-CLIENT>${socketId ? `(${socketId})` : ''}`, text);
@@ -42,6 +41,9 @@ class WSService extends TheService {
     }
 
     public init(): WSService {
+        if(this.isActive()){
+            return;
+        }
         const url: string = this.configService.get('wsUrl');
         const transports: string[] = this.configService.get('transports');        
         
@@ -232,4 +234,9 @@ class WSService extends TheService {
 }
 
 export default WSService.getSingleton();
-export { WSService as WSServiceInstance, WSEvent, WSStatus };
+export { WSService as WSServiceInstance };
+
+export type {
+    WSEvent,
+    WSStatus
+};
