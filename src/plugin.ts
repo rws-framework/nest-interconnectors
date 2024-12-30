@@ -11,7 +11,8 @@ class RWSWebsocketsPlugin extends RWSPlugin<WSOptions> {
     async onClientStart(): Promise<void> 
     {                       
         const wsService: WSServiceInstance = this.container.get(WSService);
-        const notifyService: NotifyServiceInstance = this.container.get(NotifyService);        
+        const notifyService: NotifyServiceInstance = this.container.get(NotifyService);   
+        console.log("ASDASDASDASD", this.options)     
 
         if(this.options.auto_notify){
             wsService.on('ws:disconnected', (instance, params) => {

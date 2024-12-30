@@ -19,6 +19,7 @@ class WSService extends TheService {
     static _DEFAULT: boolean = false;
     static websocket_instance: Socket;
     private _ws: Socket | null = null;
+    private socketId: string = null;
   
   
     private user: ITheUser | null = null;
@@ -63,51 +64,32 @@ class WSService extends TheService {
                 transports:  transports || null 
             });
         }          
-        //, transports:  ['websocket']
+        
         this._ws = WSService.websocket_instance;
-
-  
 
         if (this.user?.mongoId) {
             this._wsId = this.user.mongoId;
         }else{
             this._wsId = uuid();
-        }
-
-        let socketId: string = null;
+        }        
 
         this._ws.on('connect', () => {
-            socketId = this.socket().id;         
-
-            wsLog(new Error(), 'Socket connected with ID: ' + socketId, socketId);
-
-            this._connecting = false;
-            this._ws.connected = true;  
-
-            this.executeEventListener('ws:connected');               
-        
-            wsLog(new Error(), 'Emitting ping to server', socketId);
-            ping(this);
+            this.handleConnect();
         });
         
         this._ws.on('__PONG__', async (data: any) => {              
             if (data === '__PONG__') {
-                wsLog(new Error(), 'Recieving valid ping callback from server', socketId);                                                           
+                wsLog(new Error(), 'Recieving valid ping callback from server', this.socketId);                                                           
                 return;
             }
         });
 
-        this._ws.on('disconnect', async (e) => {              
-            wsLog(new Error(), 'Disconnected from the server', socketId);              
-            this.executeEventListener('ws:disconnected', { socketId: socketId, error: e });
-            socketId = null;
+        this._ws.on('disconnect', async (e: Socket.DisconnectReason) => {              
+          this.handleDisconnect(e);
         });
 
         this._ws.on('error', async (error: Error) => {
-            wsLog(error, 'Socket error:', socketId, true);
-            console.error(error);
-            this.executeEventListener('ws:error', { socketId: socketId, error: error });
-
+           this.handleError(error);
         });
         
 
@@ -230,6 +212,32 @@ class WSService extends TheService {
 
     getUrl(): string {
         return this.url;
+    }
+
+    handleConnect(){
+        this.socketId = this.socket().id;
+        wsLog(new Error(), 'Socket connected with ID: ' + this.socketId, this.socketId);
+
+        this._connecting = false;
+        this._ws.connected = true;  
+
+        this.executeEventListener('ws:connected');               
+    
+        wsLog(new Error(), 'Emitting ping to server', this.socketId);
+        ping(this);
+    }
+
+    handleDisconnect(e: Socket.DisconnectReason)
+    {
+        wsLog(new Error(), 'Disconnected from the server', this.socketId);              
+        this.executeEventListener('ws:disconnected', { socketId: this.socketId, error: e });
+        this.socketId = null;
+    }
+
+    handleError(error: Error) {
+        wsLog(error, 'Socket error:', this.socketId, true);
+        console.error(error);
+        this.executeEventListener('ws:error', { socketId: this.socketId, error: error });
     }
 }
 
