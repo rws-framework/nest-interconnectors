@@ -1,6 +1,6 @@
 {
     "name": "@rws-framework/nest-interconnectors",
-    "version": "1.2.0-beta",
+    "version": "1.2.1-beta",
     "private": false,
     "description": "",
     "main": "src/plugin.ts",
@@ -12,8 +12,8 @@
         "npm-run-all": "^4.1.1",    
         "pm2": "^5.3.0",        
         "reflect-metadata": "^0.2.1",
-        "@rws-framework/server": "^3.4.0-beta",
-        "@rws-framework/client": "^2.10.14",        
+        "@rws-framework/server": "^3.4.1-beta",
+        "@rws-framework/client": "^2.10.15",        
         "tsconfig-paths-webpack-plugin": "^4.1.0",
         "typescript": "^5.3.3",
         "webpack-node-externals": "^3.0.0"
