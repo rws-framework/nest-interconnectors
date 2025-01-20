@@ -1,6 +1,6 @@
 {
     "name": "@rws-framework/nest-interconnectors",
-    "version": "1.2.11-beta",
+    "version": "1.2.12-beta",
     "private": false,
     "description": "",
     "main": "src/plugin.ts",
