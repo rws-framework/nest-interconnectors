@@ -12,8 +12,7 @@ class RWSWebsocketsPlugin extends RWSPlugin<WSOptions> {
     {                       
         const wsService: WSServiceInstance = this.container.get(WSService);
         const notifyService: NotifyServiceInstance = this.container.get(NotifyService);   
-        console.log("ASDASDASDASD", this.options)     
-
+        
         if(this.options.auto_notify){
             wsService.on('ws:disconnected', (instance, params) => {
                 notifyService.notify(`Your websocket client disconnected from the server. Your ID was <strong>${params.socketId}</strong>`, 'error');
