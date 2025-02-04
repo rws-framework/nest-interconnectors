@@ -1,6 +1,6 @@
 {
     "name": "@rws-framework/nest-interconnectors",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "private": false,
     "description": "",
     "main": "src/plugin.ts",
@@ -26,5 +26,6 @@
     "repository": {
         "type": "git",
         "url": "git+https://github.com/papablack/rws-nest-interconnectors.git"
-    }
+    },
+    "_rws": true
 }
