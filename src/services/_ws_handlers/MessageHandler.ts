@@ -27,7 +27,7 @@ function listenForMessage(instance: WSServiceInstance, callback: (data: any, isJ
     return instance;
 }
 
-function sendMessage<T>(instance: WSServiceInstance, method: string, msg: T): void {
+function sendMessage<T>(instance: WSServiceInstance, gate: string, method: string, msg: T): void {
     if (!instance.socket()) {
         throw new Error('socket is not active');
     }
@@ -39,8 +39,8 @@ function sendMessage<T>(instance: WSServiceInstance, method: string, msg: T): vo
     };
 
     
-    instance.socket().emit(method, JSON.stringify(the_message));
-    instance.executeEventListener('ws:message_sent', { message: the_message });
+    instance.socket().emit(gate, JSON.stringify(the_message));
+    instance.executeEventListener('ws:message_sent', { gate, message: the_message });
 } 
 
 export default{

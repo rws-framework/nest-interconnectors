@@ -163,12 +163,28 @@ class WSService extends TheService {
         });
     }
 
-    public sendMessage<T>(method: string, msg: T): void {  
+    async waitForMessage<T>(msg: T, gate: string): Promise<T>
+    {
+        return new Promise((resolve, reject) => {
+            try {
+                WSMessageHandler.listenForMessage(this, (data: T, isJson?: boolean) => {
+                if(JSON.stringify(msg) === JSON.stringify(data)){
+                    resolve(data);
+                }
+            }, gate);
+            } catch(e: Error | any){
+                reject(e);
+            }
+
+        });
+    }
+
+    public sendMessage<T>(gate: string, method: string, msg: T): void {  
         if(!this.isActive()){
             this.init();
         }
 
-        WSMessageHandler.sendMessage<T>(this, method, msg);
+        WSMessageHandler.sendMessage<T>(this, gate, method, msg);
     }
 
     public statusChange(): void {
