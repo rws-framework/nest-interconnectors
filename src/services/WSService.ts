@@ -128,7 +128,7 @@ class WSService extends TheService {
         });
     }
 
-    public listenForMessage(callback: (data: any, isJson?: boolean) => void, method?: string): () => void 
+    public listenForMessage<T = unknown>(eventName: string, callback: (data: T, isJson?: boolean) => void, method?: string): () => void 
     {
         if(!this.isActive()){
             this.init();
@@ -138,7 +138,7 @@ class WSService extends TheService {
             this.socket().off(method, callback);
         };
 
-        WSMessageHandler.listenForMessage(this, callback, method);
+        WSMessageHandler.listenForMessage<T>(this, eventName, callback, method);
 
         return disableHandler.bind(this);
     }
@@ -163,15 +163,15 @@ class WSService extends TheService {
         });
     }
 
-    async waitForMessage<T>(msg: T, gate: string): Promise<T>
+    async waitForMessage<T>(eventName: string, msg: T, method: string | null): Promise<T>
     {
         return new Promise((resolve, reject) => {
             try {
-                WSMessageHandler.listenForMessage(this, (data: T, isJson?: boolean) => {
+                WSMessageHandler.listenForMessage(this, eventName,(data: T, isJson?: boolean) => {
                 if(JSON.stringify(msg) === JSON.stringify(data)){
                     resolve(data);
                 }
-            }, gate);
+            }, method);
             } catch(e: Error | any){
                 reject(e);
             }

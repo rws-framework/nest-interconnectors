@@ -1,11 +1,11 @@
 import { WSServiceInstance } from '../WSService';
 
-function listenForMessage(instance: WSServiceInstance, callback: (data: any, isJson?: boolean) => void, method?: string): WSServiceInstance {
+function listenForMessage<T = unknown>(instance: WSServiceInstance, eventName: string, callback: (data: T, isJson?: boolean) => void, method?: string): WSServiceInstance {
     if (!instance.socket()) {
         throw new Error('socket is not active');
     }
 
-    instance.socket().on(method || 'message', (data: any) => {
+    instance.socket().on(eventName, (data: any) => {
         try {            
             const parsedData = JSON.parse(data);
             if (!!method && parsedData.method === method) {                              
