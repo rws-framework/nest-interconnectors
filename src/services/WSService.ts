@@ -42,6 +42,7 @@ class WSService extends TheService {
     }
 
     public init(): WSService {
+        console.log('url', this.url);
         if(this.isActive()){
             return;
         }
