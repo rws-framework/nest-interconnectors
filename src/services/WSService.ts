@@ -18,12 +18,12 @@ const  wsLog = async (fakeError: Error, text: any, socketId: string = null, isEr
 class WSService extends TheService {
     static _DEFAULT: boolean = false;
     static websocket_instance: Socket;
-    private _ws: Socket | null = null;
+    protected _ws: Socket | null = null;
     private socketId: string = null;
   
   
-    private user: ITheUser | null = null;
-    private url: string | null = null;
+    protected user: ITheUser | null = null;
+    protected url: string | null = null;
   
     private _status_string: WSStatus = 'WS_CLOSED';
 
@@ -37,7 +37,7 @@ class WSService extends TheService {
 
     public eventListeners: Map<string, Array<(instance: WSService, params: any) => any>> = new Map();
 
-    constructor(@ConfigService private configService: ConfigServiceInstance){
+    constructor(@ConfigService protected configService: ConfigServiceInstance){
         super();
     }
 
@@ -45,12 +45,14 @@ class WSService extends TheService {
         if(this.isActive()){
             return;
         }
-        const url: string = this.configService.get('wsUrl');
+        
+        this.setPortHandler();
+
         const transports: string[] = this.configService.get('transports');        
         
         this._connecting = true;        
-        wsLog(new Error(), 'Connecting to: ' + url);
-        this.url = url;     
+        wsLog(new Error(), 'Connecting to: ' + this.url);
+     
         const user = this.user;     
 
         const headers = this.user?.jwt_token ? {
@@ -106,6 +108,11 @@ class WSService extends TheService {
         this.statusChange();
 
         return this;
+    }
+
+    protected setPortHandler(){
+        const url: string = this.configService.get('wsUrl');
+        this.url = url;
     }
 
     public getStatus(): WSStatus {
