@@ -15,12 +15,12 @@ function listenForMessage<T = unknown>(instance: WSServiceInstance, eventName: s
             } else if (!method) {
                 callback(parsedData, true);
             }            
-        } catch (e) {
-            console.error(e);
-            
+        } catch (e) {                        
             if (!method) {                
                 callback(data);
             }
+
+            // throw e;
         }
     });
 
@@ -39,7 +39,7 @@ function sendMessage<T>(instance: WSServiceInstance, gate: string, method: strin
     };
 
     
-    instance.socket().emit(gate, JSON.stringify(the_message));
+    instance.socket().emit(gate, the_message);
     instance.executeEventListener('ws:message_sent', { gate, message: the_message });
 } 
 
