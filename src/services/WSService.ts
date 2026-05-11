@@ -17,7 +17,6 @@ const  wsLog = async (fakeError: Error, text: any, socketId: string = null, isEr
 
 class WSService extends TheService {
     static _DEFAULT: boolean = false;
-    static websocket_instance: Socket;
     protected _ws: Socket | null = null;
     private socketId: string = null;
   
@@ -57,29 +56,24 @@ class WSService extends TheService {
      
         const user = this.user;     
 
-        const activeToken = this.token ?? this.user?.jwt_token ?? null;
-        const activeApiKey = this.apiKey ?? null;
+        if(!this._ws){            
+            this._ws = io(this.url, { 
+                auth: (cb: (o: Record<string, string>) => void) => {
+                    const token = this.token ?? this.user?.jwt_token ?? null;
+                    const apiKey = this.apiKey ?? null;
+                    const authObj: Record<string, string> = {};
 
-        if(!WSService.websocket_instance){            
-            const auth: Record<string, string> = {};
-            const extraHeaders: Record<string, string> = {};
+                    if (token) {
+                        authObj.token = token;
+                    } else if (apiKey) {
+                        authObj.apiKey = apiKey;
+                    }
 
-            if (activeToken) {
-                auth.token = activeToken;
-                extraHeaders.Authorization = 'Bearer ' + activeToken;
-            } else if (activeApiKey) {
-                auth.apiKey = activeApiKey;
-                extraHeaders['x-api-key'] = activeApiKey;
-            }
-
-            WSService.websocket_instance = io(this.url, { 
-                auth,
-                extraHeaders,
+                    cb(authObj);
+                },
                 transports: transports || null 
             });
-        }          
-        
-        this._ws = WSService.websocket_instance;
+        }
 
         if (this.user?.mongoId) {
             this._wsId = this.user.mongoId;
@@ -147,7 +141,7 @@ class WSService extends TheService {
     {
         this.token = token;
         this.apiKey = null;
-        WSService.websocket_instance = null;
+        this._ws = null;
         return this;
     }
 
@@ -155,7 +149,7 @@ class WSService extends TheService {
     {
         this.apiKey = apiKey;
         this.token = null;
-        WSService.websocket_instance = null;
+        this._ws = null;
         return this;
     }
 
@@ -163,7 +157,7 @@ class WSService extends TheService {
     {
         this.apiKey = null;
         this.token = null;
-        WSService.websocket_instance = null;
+        this._ws = null;
         return this;
     }
 
