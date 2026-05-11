@@ -24,6 +24,8 @@ class WSService extends TheService {
   
     protected user: ITheUser | null = null;
     protected url: string | null = null;
+    private token: string | null = null;
+    private apiKey: string | null = null;
   
     private _status_string: WSStatus = 'WS_CLOSED';
 
@@ -55,15 +57,25 @@ class WSService extends TheService {
      
         const user = this.user;     
 
-        const headers = this.user?.jwt_token ? {
-            Authorization: 'Bearer ' + this.user?.jwt_token,
-        } : {};
+        const activeToken = this.token ?? this.user?.jwt_token ?? null;
+        const activeApiKey = this.apiKey ?? null;
 
         if(!WSService.websocket_instance){            
-            const tokenString = headers.Authorization ? `?token=${this.user.jwt_token}` : '' ;
-            WSService.websocket_instance = io(this.url + tokenString, { 
-                auth: user?.jwt_token ? { token:  user.jwt_token} : {}, 
-                transports:  transports || null 
+            const auth: Record<string, string> = {};
+            const extraHeaders: Record<string, string> = {};
+
+            if (activeToken) {
+                auth.token = activeToken;
+                extraHeaders.Authorization = 'Bearer ' + activeToken;
+            } else if (activeApiKey) {
+                auth.apiKey = activeApiKey;
+                extraHeaders['x-api-key'] = activeApiKey;
+            }
+
+            WSService.websocket_instance = io(this.url, { 
+                auth,
+                extraHeaders,
+                transports: transports || null 
             });
         }          
         
@@ -126,6 +138,33 @@ class WSService extends TheService {
     setUser(user: ITheUser): void
     {
         this.user = user;
+        if (user?.jwt_token) {
+            this.setToken(user.jwt_token);
+        }
+    }
+
+    setToken(token: string): WSService
+    {
+        this.token = token;
+        this.apiKey = null;
+        WSService.websocket_instance = null;
+        return this;
+    }
+
+    setApiKey(apiKey: string): WSService
+    {
+        this.apiKey = apiKey;
+        this.token = null;
+        WSService.websocket_instance = null;
+        return this;
+    }
+
+    clearAuth(): WSService
+    {
+        this.apiKey = null;
+        this.token = null;
+        WSService.websocket_instance = null;
+        return this;
     }
 
     public listenForError<T extends Error | any = Error | any>(callback: (data: { error: T }) => void, method: string): void

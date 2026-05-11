@@ -30,7 +30,11 @@ class RWSWebsocketsPlugin extends RWSPlugin<WSOptions> {
     };
 
     async onSetUser(user: IRWSUser): Promise<void> {        
-        this.container.get(WSService).setUser(user);         
+        const wsService = this.container.get(WSService);
+        wsService.setUser(user);
+        if ((user as any)?.jwt_token) {
+            wsService.setToken((user as any).jwt_token);
+        }
     }
 }
 
