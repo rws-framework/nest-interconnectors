@@ -1,10 +1,10 @@
 import { WSServiceInstance } from '../WSService';
 
-function listenForMessage<T = unknown>(instance: WSServiceInstance, eventName: string, callback: (data: T, isJson?: boolean) => void, method?: string): WSServiceInstance {
+function listenForMessage<T = unknown>(instance: WSServiceInstance, eventName: string, callback: (data: T, isJson?: boolean) => void, method?: string, once: boolean = false): WSServiceInstance {
     if (!instance.socket()) {
         throw new Error('socket is not active');
     }
-
+    
     instance.socket().on(eventName, (data: any) => {
         try {            
             const parsedData = JSON.parse(data);
@@ -15,6 +15,10 @@ function listenForMessage<T = unknown>(instance: WSServiceInstance, eventName: s
             } else if (!method) {
                 callback(parsedData, true);
             }            
+
+            if(once){
+                instance.socket().off(eventName, callback);
+            }
         } catch (e) {                        
             if (!method) {                
                 callback(data);

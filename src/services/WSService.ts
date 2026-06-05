@@ -168,17 +168,17 @@ class WSService extends TheService {
         });
     }
 
-    public listenForMessage<T = unknown>(eventName: string, callback: (data: T, isJson?: boolean) => void, method?: string): () => void 
+    public listenForMessage<T = unknown>(eventName: string, callback: (data: T, isJson?: boolean) => void, method?: string, once: boolean = false): () => void 
     {
         if(!this.isActive()){
             this.init();
         }
 
         const disableHandler = () => {
-            this.socket().off(method, callback);
+            this.socket().off(eventName, callback);
         };
 
-        WSMessageHandler.listenForMessage<T>(this, eventName, callback, method);
+        WSMessageHandler.listenForMessage<T>(this, eventName, callback, method, once);
 
         return disableHandler.bind(this);
     }
