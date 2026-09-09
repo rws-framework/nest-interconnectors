@@ -166,8 +166,8 @@ class WSService extends TheService {
 
     setCustomToken(token: string, customName: string): WSService
     {
-        this.token = null;
-        this.apiKey = token;
+        this.token = token;
+        this.apiKey = null;
         this.customTokenName = customName;
         this._ws = null;
         return this;
