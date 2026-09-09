@@ -25,6 +25,8 @@ class WSService extends TheService {
     protected url: string | null = null;
     private token: string | null = null;
     private apiKey: string | null = null;
+
+    private customTokenName: string | null = null;
   
     private _status_string: WSStatus = 'WS_CLOSED';
 
@@ -42,36 +44,44 @@ class WSService extends TheService {
         super();
     }
 
-    public init(): WSService {  
+    public init(): WSService {
+        console.log('[WSService] init() called, isActive:', this.isActive(), 'hasToken:', !!this.token, 'hasApiKey:', !!this.apiKey, 'hasUser:', !!this.user);
         if(this.isActive()){
+            console.log('[WSService] init() skipped - already active');
             return;
         }
-        
+
         this.setPortHandler();
 
-        const transports: string[] = this.configService.get('transports');        
-        
-        this._connecting = true;        
-        wsLog(new Error(), 'Connecting to: ' + this.url);
-     
-        const user = this.user;     
+        const transports: string[] = this.configService.get('transports');
 
-        if(!this._ws){            
-            this._ws = io(this.url, { 
+        this._connecting = true;
+        wsLog(new Error(), 'Connecting to: ' + this.url);
+
+        const user = this.user;
+
+        if(!this._ws){
+            console.log('[WSService] creating new socket to:', this.url);
+            this._ws = io(this.url, {
                 auth: (cb: (o: Record<string, string>) => void) => {
                     const token = this.token ?? this.user?.jwt_token ?? null;
                     const apiKey = this.apiKey ?? null;
                     const authObj: Record<string, string> = {};
 
+                    console.log('[WSService] auth callback - hasToken:', !!token, 'hasApiKey:', !!apiKey);
+
                     if (token) {
                         authObj.token = token;
+                        if(this.customTokenName){
+                            authObj.customTokenName = this.customTokenName;
+                        }
                     } else if (apiKey) {
                         authObj.apiKey = apiKey;
                     }
 
                     cb(authObj);
                 },
-                transports: transports || null 
+                transports: transports || null
             });
         }
 
@@ -139,6 +149,7 @@ class WSService extends TheService {
 
     setToken(token: string): WSService
     {
+        console.log('[WSService] setToken called, token length:', token?.length, 'old _ws was:', this._ws ? 'connected' : 'null');
         this.token = token;
         this.apiKey = null;
         this._ws = null;
@@ -149,6 +160,15 @@ class WSService extends TheService {
     {
         this.apiKey = apiKey;
         this.token = null;
+        this._ws = null;
+        return this;
+    }
+
+    setCustomToken(token: string, customName: string): WSService
+    {
+        this.token = null;
+        this.apiKey = token;
+        this.customTokenName = customName;
         this._ws = null;
         return this;
     }
@@ -168,9 +188,11 @@ class WSService extends TheService {
         });
     }
 
-    public listenForMessage<T = unknown>(eventName: string, callback: (data: T, isJson?: boolean) => void, method?: string, once: boolean = false): () => void 
+    public listenForMessage<T = unknown>(eventName: string, callback: (data: T, isJson?: boolean) => void, method?: string, once: boolean = false): () => void
     {
+        console.log('[WSService] listenForMessage called, eventName:', eventName, 'method:', method, 'isActive:', this.isActive());
         if(!this.isActive()){
+            console.log('[WSService] listenForMessage - not active, calling init()');
             this.init();
         }
 
@@ -219,8 +241,10 @@ class WSService extends TheService {
         });
     }
 
-    public sendMessage<T>(gate: string, method: string, msg: T): void {  
+    public sendMessage<T>(gate: string, method: string, msg: T): void {
+        console.log('[WSService] sendMessage called, gate:', gate, 'method:', method, 'isActive:', this.isActive(), 'hasSocket:', !!this._ws);
         if(!this.isActive()){
+            console.log('[WSService] sendMessage - not active, calling init()');
             this.init();
         }
 
@@ -271,26 +295,29 @@ class WSService extends TheService {
     }
 
     handleConnect(){
+        console.log('[WSService] handleConnect - socket connected, id:', this.socket()?.id);
         this.socketId = this.socket().id;
         wsLog(new Error(), 'Socket connected with ID: ' + this.socketId, this.socketId);
 
         this._connecting = false;
-        this._ws.connected = true;  
+        this._ws.connected = true;
 
-        this.executeEventListener('ws:connected');               
-    
+        this.executeEventListener('ws:connected');
+
         wsLog(new Error(), 'Emitting ping to server', this.socketId);
         ping(this);
     }
 
     handleDisconnect(e: Socket.DisconnectReason)
     {
-        wsLog(new Error(), 'Disconnected from the server', this.socketId);              
+        console.log('[WSService] handleDisconnect - reason:', e, 'socketId:', this.socketId);
+        wsLog(new Error(), 'Disconnected from the server', this.socketId);
         this.executeEventListener('ws:disconnected', { socketId: this.socketId, error: e });
         this.socketId = null;
     }
 
     handleError(error: Error) {
+        console.error('[WSService] handleError:', error?.message, 'socketId:', this.socketId);
         wsLog(error, 'Socket error:', this.socketId, true);
         console.error(error);
         this.executeEventListener('ws:error', { socketId: this.socketId, error: error });
